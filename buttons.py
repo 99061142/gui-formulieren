@@ -1,4 +1,5 @@
 import tkinter
+from tkinter import ttk
 
 
 # Makes window
@@ -12,7 +13,10 @@ previous_background = tkinter.StringVar(value="gray") # Previous background colo
 button_value = tkinter.IntVar(value=0) # Value of the button with the number
 previous_num = tkinter.IntVar() # Previous value of the button with the number
 previous_bind = tkinter.StringVar() # Previous bind the user used
+previous_pressed_button = tkinter.StringVar() # Previous pressed button
 
+
+global button_loop_button # Button to loop the previous pressed button
 global button_with_num # All the information about the button with the number
 
 
@@ -21,13 +25,20 @@ def change_background():
     window.configure(bg=background.get())
 
 
+def add_previous_bind(bind):
+    bind = bind.keysym.lower() # Get the text what the user has done]
+    previous_bind.set(bind) # Set the bind to the last bind the user has used
+
+    button_loop_button['state'] = "normal" # Enable the button to loop the previous button
+
+    return bind # Return the name of the bind
+
+
 # Change the number inside the second button
 def change_num(text):
     # If it is an event the user has triggered (keyboard)
-    if text != "up" and text != "down":
-        text = text.keysym.lower() # Get the text what the user has done]
-        previous_bind.set(text) # Set the bind to the last bind the user has used
-
+    if not isinstance(text, str):
+        text = add_previous_bind(text)
 
     # Increase / decrease the number
     if text == "up" or text == "plus":
@@ -35,7 +46,9 @@ def change_num(text):
     else:
         new_number = button_value.get() - 1
 
-    button_value.set(new_number) 
+    previous_pressed_button.set(text) # Up or down
+
+    button_value.set(new_number) # Set the number
     
     # If number is lower than 0
     if new_number < 0 and previous_num.get() == 0:
@@ -127,7 +140,7 @@ def multiplied_divided_bind(event):
         new_number = button_value.get() // 3 # Change the value
 
 
-    if previous_bind.get() == "up" or previous_bind.get() == "down" or orprevious_bind.get() == "+" or previous_bind.get() == "-":
+    if previous_bind.get() == "up" or previous_bind.get() == "down" or previous_bind.get() == "+" or previous_bind.get() == "-":
         button_value.set(new_number) # Set the new value 
         change_button_value() # Update the value to the new value
 
@@ -148,8 +161,39 @@ def bindings():
     button_with_num.bind('<Double-Button-1>', multiplied_divided_bind)
 
 
+
+def button_loop():
+    active = button_loop_button.instate(['selected']) # If button is on
+
+    if active:
+        previous_button = previous_pressed_button.get() # Get the last pressed button
+        change_num(previous_button) # Change the value with the last pressed button
+
+        window.after(5000, button_loop) # Loop function every 5 seconds
+        
+
+# Make the button to loop the last clicked button
+def make_button_loop_button():
+    global button_loop_button
+
+    button_loop_button = ttk.Checkbutton(
+        window,
+        text='Last clicked button loop',
+        command=button_loop,
+        variable='',
+        onvalue='on',
+        offvalue='off',
+        state='disabled'
+    )
+    
+    button_loop_button.pack(fill='x')
+
+
+
+
 # If the code starts
 if __name__ == "__main__":
+    make_button_loop_button()
     make_buttons() # Makes the 3 buttons
     bindings() # Add the bindings
 
