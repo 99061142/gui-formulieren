@@ -14,7 +14,7 @@ window.geometry('300x150')
 window.title('Date by days calculator') # Window title
 
 
-title = tk.Label(text="Date:", font=('arial', 18, 'bold')).grid(row=0, columnspan=3) # Add the input to the screen
+title = tk.Label(text="Date:", font=('arial', 18, 'bold')).grid(columnspan=3) # Add the input to the screen
 
 
 selected_day = tk.IntVar()
@@ -30,6 +30,7 @@ def make_day_input():
     day_input['state'] = 'readonly' # User must choose a value that is a valid option
 
     day_input.grid(row=1, column=0, sticky=tk.E, padx=5, pady=5) # Add the input to the screen
+
 
 def make_month_input():    
     # create the input for the months
@@ -56,7 +57,7 @@ def submit_button():
         command=calculate_time
     )
 
-    start_button.grid(row=2, columnspan=3, pady=20)
+    start_button.grid(columnspan=3, pady=20)
 
 
 def calculate_time():
@@ -108,7 +109,7 @@ def main():
     make_day_input() # Make the input for the days
     make_month_input() # Make the input for the months
     make_year_input() # Make the input for the year
-    submit_button()
+    submit_button() # Add the submit button to the screen
 
 
 
