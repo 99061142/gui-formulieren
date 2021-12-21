@@ -30,15 +30,16 @@ def word_validation():
     guessed_letters = [letter.get().lower() for letter in random_letters] # Get all the guessed letters in lowercase
     guessed_word = ''.join(guessed_letters).lower() # String with the word the user guessed
 
+    word = chosen_word.get() # Word the user must guess
+    chosen_word_letters = list(word) # All the letters the user must guess
+
+
     # If the user guessed the word correctly
     if guessed_word == word:
         message = f"Gefeliciteerd, uw score is {0}. Wilt u nog een keer spelen?"
     
     # If the user did not guess the word correctly
     else:
-        word = chosen_word.get() # Word the user must guess
-        chosen_word_letters = list(word) # All the letters the user must guess
-
         good_position = chosen_word_length.get() # Get the total amount of points the user can have
 
         # Check how many mistakes the user made
