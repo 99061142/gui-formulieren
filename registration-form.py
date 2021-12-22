@@ -5,13 +5,13 @@ window = tk.Tk()
 window.title("Form")
 
 
-question_path = tk.StringVar(value='important')
-
+question_path = tk.StringVar(value='important') # Starting path for the questions
+head_validation = tk.BooleanVar(value=True) # If the user got all the important questions correct
 
 # ALl the questions the user must answer
 questions = {
     "important": {
-        "important_question1": '',
+        "important_question1": '0',
         "important_question2": '',
         "important_question3": '',
         "important_question4": '',
@@ -29,6 +29,7 @@ questions = {
 
 
 important_questions_answer = [] # All the important answers the user gave
+normal_questions_answer = [] # All the normal answers the user gave
 
 
 # Clear the whole window
@@ -46,7 +47,12 @@ def question_inputs():
     for row, question in enumerate(questions[path]):
         question_answer = tk.StringVar()
 
-        important_questions_answer.append(question_answer) 
+        # Add the answer of the users to the specific list for the path
+        if path == "important":
+            important_questions_answer.append(question_answer) 
+        else:
+            normal_questions_answer.append(question_answer) 
+
 
         tk.Label(text=f"{question}: ", font=('arial', 12)).grid(row=row, column=0) # Label with the question before the input
 
@@ -89,13 +95,16 @@ def question_passing():
     else:
         validation = validate_normal_questions(path) # Validate the normal questions
 
-    # If the user did not answered the important questions correctly, or the user answered all the questions correctly
-    if not validation or validation and path != "important":
-        end_screen(validation) # Show the information about the answers / if the user answered the questions correctly
+    if head_validation.get() and not validation:
+        head_validation.set(False)
+
+    # If it were the last questions
+    if path == list(questions)[-1]:
+        end_screen() # Show the information about the answers / if the user answered the questions correctly
 
     # If the user correctly answered all the important answers
     else: 
-        question_keys = list(questions.keys()) # Get the question paths
+        question_keys = list(questions) # Get the question paths
 
         # Get the next path for the next questions
         new_path_index = question_keys.index(path) + 1
@@ -107,8 +116,10 @@ def question_passing():
 
 
 # End screen
-def end_screen(validation):
-    if validation:
+def end_screen():
+    clear_window() # Clear the window
+
+    if head_validation.get():
         print("You have correctly answered all the questions")
     else:
         print("Sadly you don't have a chance to get a ticket")
