@@ -30,14 +30,15 @@ def clear_window():
 # Make the label / inputs for the questions
 def question_inputs(path):
     # For every question the user must answer
-    for question in questions[path]:
+    for row, question in enumerate(questions[path]):
         question_answer = tk.StringVar()
 
         important_questions_answer.append(question_answer) 
 
+        tk.Label(text=f"{question}: ", font=('arial', 12)).grid(row=row, column=0) # Label with the question before the input
+
         question_input = tk.Entry(window, textvariable=question_answer, width=25) # Input to answer the question
-        
-        question_input.pack() # Add the input to the window
+        question_input.grid(row=row, column=1) # Add the input to the window
 
 
 # Validate the normal question answers
@@ -99,7 +100,7 @@ def head_question_screen():
 
     question_inputs('important') # Make the important questions
 
-    tk.Button(text="Start", font=('arial', 20), command=lambda: head_question_passing('important')).pack() # Button to submit the answer
+    tk.Button(text="Submit", font=('arial', 20), command=lambda: head_question_passing('important')).grid(columnspan=2) # Button to submit the answers
 
 
 # Homescreen when the user starts the program
@@ -107,8 +108,8 @@ def homescreen():
     tk.Label(text="Registrate yourself for the e-sport conference day", font=('arial', 18, 'bold')).pack(fill='x', pady=10) # Title for homescreen
 
     # Note before the user starts
-    tk.Label(text=f"* NOTE", font=('arial', 15)).pack(fill='x', pady=5)
-    tk.Label(text=("If you completed the form you can get the ticket, else you can't come to the conference"), font=('arial', 12)).pack(fill='x')
+    tk.Label(text="* NOTE", font=('arial', 15)).pack(fill='x', pady=5)
+    tk.Label(text="If you completed the form you can get the ticket, else you can't come to the conference", font=('arial', 12)).pack(fill='x')
 
     tk.Button(text="Start", font=('arial', 20), command=head_question_screen).pack(ipadx=20, pady=50) # Starting button
 
