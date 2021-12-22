@@ -5,15 +5,26 @@ window = tk.Tk()
 window.title("Form")
 
 
+question_path = tk.StringVar(value='important')
+
+
 # ALl the questions the user must answer
 questions = {
     "important": {
-        "question1": '0',
-        "question2": '0',
-        "question3": '0',
-        "question4": '0',
-        "question5": '0',
-    }
+        "important_question1": '',
+        "important_question2": '',
+        "important_question3": '',
+        "important_question4": '',
+        "important_question5": '',
+    },
+
+    "normal": [
+        "normal_question1",
+        "normal_question2",
+        "normal_question3",
+        "normal_question4",
+        "normal_question5"
+    ]
 }
 
 
@@ -28,7 +39,9 @@ def clear_window():
 
 
 # Make the label / inputs for the questions
-def question_inputs(path):
+def question_inputs():
+    path = question_path.get()
+
     # For every question the user must answer
     for row, question in enumerate(questions[path]):
         question_answer = tk.StringVar()
@@ -42,18 +55,19 @@ def question_inputs(path):
 
 
 # Validate the normal question answers
-def validate_normal_questions():
-    pass
+def validate_normal_questions(path):
+    return True
 
 
 # Validate the important question answers
-def validate_important_questions():
+def validate_important_questions(path):
     validation = True
 
     correct_answers = list( questions['important'].values() ) # Answers the user must give to the questions
 
     # Check every answer the user gave to the questions
     for answer, correct_answer in zip(important_questions_answer, correct_answers):
+    
         # If the user did not choose the correct anwer
         if answer.get() != correct_answer:
             validation = False 
@@ -63,14 +77,17 @@ def validate_important_questions():
 
 
 # Validate the answer the user gave, and go to the next questions or show the end screen
-def head_question_passing(path):
+def question_passing():
+    path = question_path.get()
+
+
     # If the user must answer the important questions
     if path == "important":
-        validation = validate_important_questions() # Validate the important questions
+        validation = validate_important_questions(path) # Validate the important questions
     
     # If the user must answer the normal questions
     else:
-        validation = validate_normal_questions() # Validate the normal questions
+        validation = validate_normal_questions(path) # Validate the normal questions
 
     # If the user did not answered the important questions correctly, or the user answered all the questions correctly
     if not validation or validation and path != "important":
@@ -78,7 +95,15 @@ def head_question_passing(path):
 
     # If the user correctly answered all the important answers
     else: 
-        normal_question_screen() # Go to the normal questions
+        question_keys = list(questions.keys()) # Get the question paths
+
+        # Get the next path for the next questions
+        new_path_index = question_keys.index(path) + 1
+        new_path = question_keys[new_path_index]
+
+        question_path.set(new_path) # Set the new path
+
+        question_screen() # Go to question screen
 
 
 # End screen
@@ -89,18 +114,14 @@ def end_screen(validation):
         print("Sadly you don't have a chance to get a ticket")
 
 
-# Screen with the normal questions (that can have any value)
-def normal_question_screen():
+def question_screen():
+    path = question_path.get() # Path for the questions
+
     clear_window() # Clear the window
 
+    question_inputs() # Make the normal questions
 
-# Screen with the important questions (that must be true)
-def head_question_screen():
-    clear_window() # Clear the window
-
-    question_inputs('important') # Make the important questions
-
-    tk.Button(text="Submit", font=('arial', 20), command=lambda: head_question_passing('important')).grid(columnspan=2) # Button to submit the answers
+    tk.Button(text="Submit", font=('arial', 20), command=question_passing).grid(columnspan=2) # Button to submit the answers
 
 
 # Homescreen when the user starts the program
@@ -111,7 +132,7 @@ def homescreen():
     tk.Label(text="* NOTE", font=('arial', 15)).pack(fill='x', pady=5)
     tk.Label(text="If you completed the form you can get the ticket, else you can't come to the conference", font=('arial', 12)).pack(fill='x')
 
-    tk.Button(text="Start", font=('arial', 20), command=head_question_screen).pack(ipadx=20, pady=50) # Starting button
+    tk.Button(text="Start", font=('arial', 20), command=question_screen).pack(ipadx=20, pady=50) # Starting button
 
 
 
