@@ -1,12 +1,10 @@
 import tkinter as tk
+from random import choice
 
 # Makes the window
 window = tk.Tk()
 window.title("Form")
 
-
-question_path = tk.StringVar(value='important') # Starting path for the questions
-head_validation = tk.BooleanVar(value=True) # If the user got all the important questions correct
 
 # ALl the questions the user must answer
 questions = {
@@ -28,6 +26,10 @@ questions = {
 }
 
 
+question_path = tk.StringVar(value='important') # Starting path for the questions
+head_validation = tk.BooleanVar(value=True) # If the user got all the important questions correct
+
+
 important_questions_answer = [] # All the important answers the user gave
 normal_questions_answer = [] # All the normal answers the user gave
 
@@ -37,6 +39,15 @@ def clear_window():
     # Clear the window
     for items in window.winfo_children():
         items.destroy()
+
+
+# Make a registration code
+def make_registration_code():
+    characters = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" # Alowed characters
+
+    registration_code = ''.join([choice(characters) for _ in range(16)]) # Make a random registration code with the alowed characters
+    
+    return registration_code # Return the registration code
 
 
 # Make the label / inputs for the questions
@@ -133,6 +144,11 @@ def end_screen():
         for position, (answer, question) in enumerate(zip(all_answers, all_questions)):
             tk.Label(text=f"Voor de vraag '{question}', was jou antwoord: ", font=('arial', 15)).grid(column=0, row=position)
             tk.Label(textvariable=answer, font=('arial', 15)).grid(column=1, row=position)
+        else:
+            registration_code = make_registration_code() # Get the random generated registration code
+
+            tk.Label(text=f"Jou registratie code is '{registration_code}'", font=('arial', 15)).grid(columnspan=2, pady=20)
+
     else:
         tk.Label(text="Sadly you don't have a chance to get a ticket", font=('arial', 15)).pack(fill='both')
 
