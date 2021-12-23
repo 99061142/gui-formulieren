@@ -11,7 +11,7 @@ head_validation = tk.BooleanVar(value=True) # If the user got all the important 
 # ALl the questions the user must answer
 questions = {
     "important": {
-        "important_question1": '0',
+        "important_question1": '',
         "important_question2": '',
         "important_question3": '',
         "important_question4": '',
@@ -120,9 +120,21 @@ def end_screen():
     clear_window() # Clear the window
 
     if head_validation.get():
-        print("You have correctly answered all the questions")
+        all_answers = important_questions_answer + normal_questions_answer # All the answers the user gave
+
+        # Add the questions to the list
+        all_questions = [] 
+
+        for path in questions:
+            all_questions = all_questions + list(questions[path])
+
+
+        # Show the question + the answer of the user
+        for position, (answer, question) in enumerate(zip(all_answers, all_questions)):
+            tk.Label(text=f"Voor de vraag '{question}', was jou antwoord: ", font=('arial', 15)).grid(column=0, row=position)
+            tk.Label(textvariable=answer, font=('arial', 15)).grid(column=1, row=position)
     else:
-        print("Sadly you don't have a chance to get a ticket")
+        tk.Label(text="Sadly you don't have a chance to get a ticket", font=('arial', 15)).pack(fill='both')
 
 
 def question_screen():
