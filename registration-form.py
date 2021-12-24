@@ -9,19 +9,19 @@ window.title("Form")
 # ALl the questions the user must answer
 questions = {
     "important": {
-        "important_question1": '',
-        "important_question2": '',
-        "important_question3": '',
-        "important_question4": '',
-        "important_question5": '',
+        "How old are you": 18,
+        "Do you already have a team?": "yes",
+        "Does your team have the same amount of players to play a match?": "yes",
+        "Are all your teammates 18 years or older": "yes",
+        "Are you and your teammates only in your team? (So not in other peoples team that want to attend)": "yes",
     },
 
     "normal": [
-        "normal_question1",
-        "normal_question2",
-        "normal_question3",
-        "normal_question4",
-        "normal_question5"
+        "What's your name?",
+        "How many km do you live from the building?",
+        "Did you ever played in a previous e-sport team?",
+        "If you played in a previous e-sports team, what was your placement?",
+        "Which game(s) do you wanna play?"
     ]
 }
 
@@ -45,78 +45,49 @@ def clear_window():
 def make_registration_code():
     characters = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" # Alowed characters
 
-    registration_code = ''.join([choice(characters) for _ in range(16)]) # Make a random registration code with the alowed characters
+    registration_code = "".join([choice(characters) for _ in range(16)]) # Make a random registration code with the alowed characters
     
     return registration_code # Return the registration code
 
 
-# Make the label / inputs for the questions
-def question_inputs():
-    path = question_path.get()
-
-    # For every question the user must answer
-    for row, question in enumerate(questions[path]):
-        question_answer = tk.StringVar()
-
-        # Add the answer of the users to the specific list for the path
-        if path == "important":
-            important_questions_answer.append(question_answer) 
-        else:
-            normal_questions_answer.append(question_answer) 
-
-
-        tk.Label(text=f"{question}: ", font=('arial', 12)).grid(row=row, column=0) # Label with the question before the input
-
-        question_input = tk.Entry(window, textvariable=question_answer, width=25) # Input to answer the question
-        question_input.grid(row=row, column=1) # Add the input to the window
-
-
-# Validate the normal question answers
-def validate_normal_questions(path):
-    return True
-
-
 # Validate the important question answers
-def validate_important_questions(path):
-    validation = True
+def validate_important_questions():
+    validation = True # If the answers are correctly answered
 
-    correct_answers = list( questions['important'].values() ) # Answers the user must give to the questions
+    correct_answers = list( questions['important'].values() ) # Correct answers for the question
 
     # Check every answer the user gave to the questions
     for answer, correct_answer in zip(important_questions_answer, correct_answers):
     
         # If the user did not choose the correct anwer
-        if answer.get() != correct_answer:
-            validation = False 
+        if answer.get().isdigit():
+            if int(answer.get()) < correct_answer:
+                validation = False
+                break
+        else:
+            if answer.get() != correct_answer:
+                validation = False 
+                break
 
-
-    return validation # Return if the user correctly answered the important questions
+    head_validation.set(validation) # Set the value if the user answered all the questions correctly
 
 
 # Validate the answer the user gave, and go to the next questions or show the end screen
 def question_passing():
-    path = question_path.get()
+    path = question_path.get() # Get which questions must be checked 
+    question_keys = list(questions) # Get the question paths
 
+    # If the user answered the important questions
+    if path == question_keys[0]:
+        validate_important_questions() # Validate the important questions
+        
 
-    # If the user must answer the important questions
-    if path == "important":
-        validation = validate_important_questions(path) # Validate the important questions
-    
-    # If the user must answer the normal questions
-    else:
-        validation = validate_normal_questions(path) # Validate the normal questions
-
-    if head_validation.get() and not validation:
-        head_validation.set(False)
-
-    # If it were the last questions
-    if path == list(questions)[-1]:
+    # If the user answered the last questions
+    elif path == question_keys[-1]:
         end_screen() # Show the information about the answers / if the user answered the questions correctly
 
-    # If the user correctly answered all the important answers
-    else: 
-        question_keys = list(questions) # Get the question paths
-
+    # Make the new questions after the user submitted the answers
+    if path != question_keys[-1]: 
         # Get the next path for the next questions
         new_path_index = question_keys.index(path) + 1
         new_path = question_keys[new_path_index]
@@ -142,34 +113,50 @@ def end_screen():
 
         # Show the question + the answer of the user
         for position, (answer, question) in enumerate(zip(all_answers, all_questions)):
-            tk.Label(text=f"Voor de vraag '{question}', was jou antwoord: ", font=('arial', 15)).grid(column=0, row=position)
+            tk.Label(text=f"For the question '{question}', was your answer: ", font=('arial', 15)).grid(column=0, row=position)
             tk.Label(textvariable=answer, font=('arial', 15)).grid(column=1, row=position)
         else:
             registration_code = make_registration_code() # Get the random generated registration code
 
-            tk.Label(text=f"Jou registratie code is '{registration_code}'", font=('arial', 15)).grid(columnspan=2, pady=20)
+            tk.Label(text=f"Your registration code is '{registration_code}'", font=('arial', 15)).grid(columnspan=2, pady=20) # Show the registration code
 
     else:
         tk.Label(text="Sadly you don't have a chance to get a ticket", font=('arial', 15)).pack(fill='both')
 
 
+# Show the question screen 
 def question_screen():
-    path = question_path.get() # Path for the questions
-
     clear_window() # Clear the window
 
-    question_inputs() # Make the normal questions
+    path = question_path.get() # Get which questions must be made 
 
-    tk.Button(text="Submit", font=('arial', 20), command=question_passing).grid(columnspan=2) # Button to submit the answers
+    # For every question the user must answer
+    for row, question in enumerate(questions[path]):
+        question_answer = tk.StringVar()
+
+        # Add the answer of the user to the specific list for the path
+        if path == "important":
+            important_questions_answer.append(question_answer) 
+        else:
+            normal_questions_answer.append(question_answer) 
+
+
+        tk.Label(text=f"{question}: ", font=('arial', 12)).grid(row=row, column=0) # Label with the question before the input
+
+        question_input = tk.Entry(window, textvariable=question_answer, width=25).grid(row=row, column=1) # Input to answer the question
+    
+    # When every question label / input is made
+    else:
+        tk.Button(text="Submit", font=('arial', 20), command=question_passing).grid(columnspan=2) # Button to submit the answers
 
 
 # Homescreen when the user starts the program
 def homescreen():
-    tk.Label(text="Registrate yourself for the e-sport conference day", font=('arial', 18, 'bold')).pack(fill='x', pady=10) # Title for homescreen
+    tk.Label(text="Registrate yourself for the e-sports day", font=('arial', 18, 'bold')).pack(fill='x', pady=10) # Title for homescreen
 
     # Note before the user starts
     tk.Label(text="* NOTE", font=('arial', 15)).pack(fill='x', pady=5)
-    tk.Label(text="If you completed the form you can get the ticket, else you can't come to the conference", font=('arial', 12)).pack(fill='x')
+    tk.Label(text="If you completed the form you can get the ticket, else you can't come to the ", font=('arial', 12)).pack(fill='x')
 
     tk.Button(text="Start", font=('arial', 20), command=question_screen).pack(ipadx=20, pady=50) # Starting button
 
